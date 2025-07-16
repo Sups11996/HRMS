@@ -1,10 +1,6 @@
 import mongoose from 'mongoose';
 
 const LeaveRequestSchema = new mongoose.Schema({
-    _id: {
-    type: mongoose.Schema.Types.ObjectId,
-    auto: true, 
-  },
   employeeId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Employee',
