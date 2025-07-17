@@ -1,5 +1,5 @@
 import express from 'express';
-// import connectDB from './config/database.js';
+import connectDB from './config/database.js';
 
 import UserRouter from './routes/user.router.js'
 

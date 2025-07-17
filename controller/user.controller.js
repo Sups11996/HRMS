@@ -1,5 +1,5 @@
 import { trusted } from 'mongoose';
-import { User } from '../models/user.model'
+import { User } from '../models/user.model.js'
 import bcrypt from 'bcrypt'
 
 // Create a new user
