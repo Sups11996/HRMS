@@ -11,8 +11,8 @@ const app = express();
 app.use(express.json());
 
 
-app.use('/api',UserRouter)
-app.use('/api',BookRouter)
+app.use('/api',UserRouter);
+app.use('/api',BookRouter);
 app.use('/api',authRouter);
 
 
