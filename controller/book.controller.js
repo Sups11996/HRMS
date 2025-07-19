@@ -48,22 +48,38 @@ export const getAllBooks = async (req, res) => {
     }
 }
 
-// get book by id
-export const getBookById = async (req, res) => {
-    try{
-        const book = await Book.findById(req.params.id);
+// Borrow book
+export const borrowBook = async (req, res) => {
+    try {
+        const { bookId } = req.params;
+        const userId = req.user.id;
 
-        if(!book){
+        // find the book
+        const book = await Book.findById(bookId);
+        if (!book) {
             return res.status(404).json({
                 message: 'Book not found'
+            });
+        }
+
+        if (book.availableCopies <= 0) {
+            return res.status(400).json({
+                message: "Book is out of stock."
             })
         }
 
+        book.availableCopies -= 1;
+        await book.save();
+
         res.status(201).json({
-            message: "Book fetched successfully.",
-            book,
-        })
-    }catch (error) {
+            message: "Book borrowed successfully.",
+            book: {
+                id: book._id,
+                name: book.name,
+                remainingCopies: book.availableCopies,
+            },
+        });
+    } catch (error) {
         res.status(500).json({
             message: "Internal Server Error",
             error: error.message,
@@ -73,14 +89,14 @@ export const getBookById = async (req, res) => {
 
 // update book
 export const updateBook = async (req, res) => {
-    try{
+    try {
         const updatedbook = await Book.findByIdAndUpdate(
             req.params.id,
             req.body,
-            {new: true}
+            { new: true }
         );
 
-        if(!updatedBook){
+        if (!updatedBook) {
             return res.status(404).json({
                 message: 'Book not found'
             })
@@ -89,7 +105,7 @@ export const updateBook = async (req, res) => {
             message: 'Updated Book Successfully.',
             updatedbook,
         })
-    }catch (error) {
+    } catch (error) {
         res.status(500).json({
             message: "Internal Server Error",
             error: error.message,
@@ -99,10 +115,10 @@ export const updateBook = async (req, res) => {
 
 // deleting a book
 export const deleteBook = async (req, res) => {
-    try{
+    try {
         const deletedBook = await Book.findByIdAndDelete(req.params.id)
 
-        if(!deletedBook){
+        if (!deletedBook) {
             return res.status(404).json({
                 message: 'Book not found.',
             })
@@ -111,7 +127,7 @@ export const deleteBook = async (req, res) => {
             message: 'Book deleted successfully.',
             deletedBook,
         })
-    }catch (error) {
+    } catch (error) {
         res.status(500).json({
             message: "Internal Server Error",
             error: error.message,
