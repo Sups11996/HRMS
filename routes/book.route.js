@@ -7,12 +7,15 @@ import {
     deleteBook
 } from '../controller/book.controller.js'
 
+import { verifyToken } from '../middleware/auth.middleware.js';
+import { verifyLibrarian, verifyBorrower } from '../middleware/role.middleware.js';
+
 const router = express.Router();
 
-router.post('/addBook', createbook);
+router.post('/addBook',verifyToken, verifyLibrarian, createbook);
 router.get('/getAllBooks', getAllBooks);
-router.post('borrow/:id', borrowBook)
-router.put('/updateBook/:id', updateBook);
-router.delete('/deleteBook/:id', deleteBook);
+router.post('borrow/:id',verifyToken, verifyBorrower, borrowBook)
+router.put('/updateBook/:id',verifyToken, verifyLibrarian, updateBook);
+router.delete('/deleteBook/:id',verifyToken, verifyLibrarian, deleteBook);
 
 export default router
