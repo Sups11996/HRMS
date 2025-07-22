@@ -2,7 +2,6 @@ import express from 'express'
 import {
     createbook,
     getAllBooks,
-    borrowBook,
     updateBook,
     deleteBook
 } from '../controller/book.controller.js'
@@ -14,7 +13,7 @@ const router = express.Router();
 
 router.post('/addBook',verifyToken, verifyLibrarian, createbook);
 router.get('/getAllBooks', getAllBooks);
-router.post('borrow/:id',verifyToken, verifyBorrower, borrowBook)
+// router.post('borrow/:id',verifyToken, verifyBorrower, borrowBook)
 router.put('/updateBook/:id',verifyToken, verifyLibrarian, updateBook);
 router.delete('/deleteBook/:id',verifyToken, verifyLibrarian, deleteBook);
 
