@@ -1,18 +1,22 @@
-import mongoose, { mongo }  from "mongoose";
+import mongoose, { mongo } from "mongoose";
 
 const BookSchema = new mongoose.Schema({
-    name: {
+    title: {
         type: String,
         required: true
     },
     author: {
         type: String
     },
-    availableCopies: {
-        type: Number,
+    isbn: {
+        type: String,
+        unique: true
     },
-    category: {
-        type: String
+    quantity: {
+        type: Number
+    },
+    available: {
+        type: Number
     }
 })
 

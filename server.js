@@ -4,6 +4,7 @@ import connectDB from './config/database.js';
 import UserRouter from './routes/user.route.js'
 import BookRouter from './routes/book.route.js'
 import authRouter from './routes/auth.route.js'
+import { BorrowRouter } from './routes/borrow.route.js'
 
 const PORT = 3000
 
