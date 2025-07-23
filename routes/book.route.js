@@ -11,10 +11,9 @@ import { verifyLibrarian, verifyBorrower } from '../middleware/role.middleware.j
 
 const router = express.Router();
 
-router.post('/addBook',verifyToken, verifyLibrarian, createbook);
+router.post('/addBook', verifyToken, verifyLibrarian, createbook);
 router.get('/getAllBooks', getAllBooks);
-// router.post('borrow/:id',verifyToken, verifyBorrower, borrowBook)
-router.put('/updateBook/:id',verifyToken, verifyLibrarian, updateBook);
-router.delete('/deleteBook/:id',verifyToken, verifyLibrarian, deleteBook);
+router.put('/updateBook/:id', verifyToken, verifyLibrarian, updateBook);
+router.delete('/deleteBook/:id', verifyToken, verifyLibrarian, deleteBook);
 
 export default router

@@ -2,17 +2,17 @@ import { Borrow } from "../models/borrow.model.js";
 import { Book } from "../models/book.model.js";
 
 export const borrowBook = async (req, res) => {
-    try{
-        const {userId, bookId} = req.body;
+    try {
+        const { userId, bookId } = req.body;
 
         const book = await Book.findById(bookId);
-        if(!book){
+        if (!book) {
             return res.status(404).json({
                 message: "Book not found."
             })
         }
 
-        if(book.available <= 0){
+        if (book.available <= 0) {
             return res.status(400).json({
                 message: "Book is not available at the moment."
             })
@@ -33,7 +33,7 @@ export const borrowBook = async (req, res) => {
             message: "Book borrowed successfully.",
             borrow,
         })
-    }catch (error) {
+    } catch (error) {
         res.status(500).json({
             message: "Internal Server Error",
             error: error.message,
@@ -43,12 +43,12 @@ export const borrowBook = async (req, res) => {
 
 
 export const returnBook = async (req, res) => {
-    try{
-        const {borrowId} = req.params;
-        
+    try {
+        const { borrowId } = req.params;
+
         const borrow = await Borrow.findById(borrowId);
 
-        if(!borrow || borrow.returnDate!== null){
+        if (!borrow || borrow.returnDate !== null) {
             return res.status(404).json({
                 message: "Borrow record not found"
             })
@@ -58,7 +58,7 @@ export const returnBook = async (req, res) => {
         await borrow.save();
 
         const book = await Book.findById(borrow.bookId);
-        if(book){
+        if (book) {
             book.available += 1;
             await book.save();
         }
@@ -67,7 +67,7 @@ export const returnBook = async (req, res) => {
             message: "Book returned successfully.",
             borrow
         })
-    }catch (error) {
+    } catch (error) {
         res.status(500).json({
             message: "Internal Server Error",
             error: error.message,

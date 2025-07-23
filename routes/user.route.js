@@ -14,6 +14,6 @@ router.post('/auth/register', createUser);
 router.get('/getAllUsers', getAllUsers);
 router.get('/getUserById/:id', getUserById);
 router.put('/updateUser/:id', updateUser);
-router.delete('/deleteUser/:id',deleteUser);
+router.delete('/deleteUser/:id', deleteUser);
 
 export default router;

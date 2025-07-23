@@ -1,11 +1,11 @@
 import jwt from 'jsonwebtoken';
 
 export const verifyToken = (req, res, next) => {
-    try{
+    try {
         const authHeader = req.headers.authorization;
 
         // check for the bearer token
-        if(!authHeader || !authHeader.startsWith("Bearer ")){
+        if (!authHeader || !authHeader.startsWith("Bearer ")) {
             return res.status(401).json({
                 message: 'Unauthorized: No token provided.'
             })

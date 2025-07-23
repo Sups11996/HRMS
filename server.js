@@ -12,10 +12,10 @@ const app = express();
 app.use(express.json());
 
 
-app.use('/api',UserRouter);
-app.use('/api',BookRouter);
-app.use('/api',AuthRouter);
-app.use('/api',BorrowRouter);
+app.use('/api', UserRouter);
+app.use('/api', BookRouter);
+app.use('/api', AuthRouter);
+app.use('/api', BorrowRouter);
 
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

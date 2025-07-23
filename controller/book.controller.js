@@ -3,7 +3,7 @@ import { Book } from "../models/book.model.js";
 // add a new book
 export const createbook = async (req, res) => {
     try {
-        const { title, author, isbn, available} = req.body;
+        const { title, author, isbn, available } = req.body;
 
         if (!title || !author || !isbn || !available) {
             return res.status(400).json({
@@ -47,45 +47,6 @@ export const getAllBooks = async (req, res) => {
         });
     }
 }
-
-// Borrow book
-// export const borrowBook = async (req, res) => {
-//     try {
-//         const { bookId } = req.params;
-//         const userId = req.user.id;
-
-//         // find the book
-//         const book = await Book.findById(bookId);
-//         if (!book) {
-//             return res.status(404).json({
-//                 message: 'Book not found'
-//             });
-//         }
-
-//         if (book.available <= 0) {
-//             return res.status(400).json({
-//                 message: "Book is out of stock."
-//             })
-//         }
-
-//         book.available -= 1;
-//         await book.save();
-
-//         res.status(201).json({
-//             message: "Book borrowed successfully.",
-//             book: {
-//                 id: book._id,
-//                 title: book.title,
-//                 remainingCopies: book.available,
-//             },
-//         });
-//     } catch (error) {
-//         res.status(500).json({
-//             message: "Internal Server Error",
-//             error: error.message,
-//         });
-//     }
-// }
 
 // update book
 export const updateBook = async (req, res) => {
