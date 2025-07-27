@@ -1,4 +1,5 @@
 import { Book } from "../models/book.model.js";
+import generateSixDigitId from './id.generator.js';
 
 // add a new book
 export const createbook = async (req, res) => {
@@ -14,7 +15,16 @@ export const createbook = async (req, res) => {
         if (!/^[A-Za-z ]+$/.test(author)) return res.status(400).json({ message: 'Author name should contain only letters' });
         if (typeof available !== "number" || available < 0) return res.status(400).json({ message: 'Available copies should be a non-negative number' });
 
+        const existingBook = await Book.findOne({ isbn });
+        if (existingBook) {
+            return res.status(400).json({
+                message: "This book already exists in the library.",
+            });
+        }
+
+        const bookId = generateSixDigitId();
         const newBook = new Book({
+            _id: bookId,
             title,
             author,
             isbn,

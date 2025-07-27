@@ -1,6 +1,6 @@
-import { trusted } from 'mongoose';
 import { User } from '../models/user.model.js'
 import bcrypt from 'bcrypt'
+import generateSixDigitId from './id.generator.js';
 
 // Create a new user
 export const createUser = async (req, res) => {
@@ -27,8 +27,10 @@ export const createUser = async (req, res) => {
         }
 
         const hashedPassword = bcrypt.hashSync(password, 10);
+        const userId = generateSixDigitId();
 
         const newUser = new User({
+            _id: userId,
             name,
             email,
             password: hashedPassword,

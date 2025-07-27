@@ -5,6 +5,13 @@ export const borrowBook = async (req, res) => {
     try {
         const { userId, bookId } = req.body;
 
+        const activeBorrows = await Borrow.countDocuments({ userId, returnDate: null });
+        if (activeBorrows >= 3) {
+            return res.status(400).json({
+                message: "You have reached the maximum number of borrowed books (3)."
+            });
+        }
+
         const book = await Book.findById(bookId);
         if (!book) {
             return res.status(404).json({
