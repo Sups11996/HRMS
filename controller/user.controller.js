@@ -92,7 +92,7 @@ export const getAllUsers = async (req, res) => {
 export const updateUser = async (req, res) => {
     try {
         const updates = req.body;
-        const updatedUser = await User.findByIdAndDelete(
+        const updatedUser = await User.findByIdAndUpdate(
             req.params.id,
             updates,
             { new: true }

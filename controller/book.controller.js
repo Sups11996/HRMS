@@ -51,7 +51,7 @@ export const getAllBooks = async (req, res) => {
 // update book
 export const updateBook = async (req, res) => {
     try {
-        const updatedbook = await Book.findByIdAndUpdate(
+        const updatedBook = await Book.findByIdAndUpdate(
             req.params.id,
             req.body,
             { new: true }
@@ -64,7 +64,7 @@ export const updateBook = async (req, res) => {
         }
         res.status(201).json({
             message: 'Updated Book Successfully.',
-            updatedbook,
+            updatedBook,
         })
     } catch (error) {
         res.status(500).json({
