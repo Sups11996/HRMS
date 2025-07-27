@@ -11,6 +11,9 @@ export const createbook = async (req, res) => {
             });
         }
 
+        if (!/^[A-Za-z ]+$/.test(author)) return res.status(400).json({ message: 'Author name should contain only letters' });
+        if (typeof available !== "number" || available < 0) return res.status(400).json({ message: 'Available copies should be a non-negative number' });
+
         const newBook = new Book({
             title,
             author,

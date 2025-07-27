@@ -13,6 +13,11 @@ export const createUser = async (req, res) => {
             })
         }
 
+        if (!/^[A-Za-z ]+$/.test(name)) return res.status(400).json({ message: 'Name should contain only letters' });
+        if (!/^\S+@\S+\.\S+$/.test(email)) return res.status(400).json({ message: 'Invalid email format' });
+        if (password.length < 8) return res.status(400).json({ message: 'Password must be at least 8 characters' });
+
+
         // check for existing user
         const alreadyExists = await User.findOne({ email });
         if (alreadyExists) {
