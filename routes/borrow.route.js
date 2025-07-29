@@ -10,7 +10,7 @@ router.post('/borrow', verifyToken, verifyBorrower, borrowBook);
 
 router.put('/return/:bookId', verifyToken, verifyBorrower, returnBook);
 
-router.get('/all', verifyToken, verifyLibrarian ,getAllBorrows);
+router.get('/all', verifyToken, verifyLibrarian, getAllBorrows);
 
 
 export default router;

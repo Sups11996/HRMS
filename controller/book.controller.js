@@ -1,5 +1,5 @@
 import { Book } from "../models/book.model.js";
-import generateSixDigitId from './id.generator.js';
+import generateSixDigitId from '../utils/id.generator.js';
 
 // add a new book
 export const createbook = async (req, res) => {

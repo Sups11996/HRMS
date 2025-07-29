@@ -1,6 +1,6 @@
 import { User } from '../models/user.model.js'
 import bcrypt from 'bcrypt'
-import generateSixDigitId from './id.generator.js';
+import generateSixDigitId from '../utils/id.generator.js';
 
 // Create a new user
 export const createUser = async (req, res) => {

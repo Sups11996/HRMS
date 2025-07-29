@@ -22,7 +22,7 @@ const BookSchema = new mongoose.Schema({
     available: {
         type: Number
     },
-    
+
 })
 
 export const Book = mongoose.model("Book", BookSchema)
