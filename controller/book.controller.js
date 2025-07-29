@@ -49,6 +49,7 @@ export const createbook = async (req, res) => {
 export const getAllBooks = async (req, res) => {
     try {
         const books = await Book.find();
+
         res.status(201).json({
             message: "All books fetched.",
             books,

@@ -1,5 +1,7 @@
+import { formatCustomDate } from "../utils/date.formatter.js";
 import { Borrow } from "../models/borrow.model.js";
 import { Book } from "../models/book.model.js";
+import { User } from "../models/user.model.js";
 
 export const borrowBook = async (req, res) => {
     try {
@@ -25,10 +27,15 @@ export const borrowBook = async (req, res) => {
             })
         }
 
+        const borrowDate = new Date();
+        const dueDate = new Date(borrowDate);
+        dueDate.setDate(dueDate.getDate() + 7);
+
         const borrow = new Borrow({
             userId,
             bookId,
-            borrowDate: new Date(),
+            borrowDate,
+            dueDate,
             returnDate: null
         })
 
@@ -36,9 +43,25 @@ export const borrowBook = async (req, res) => {
         book.available -= 1;
         await book.save();
 
+        await User.findByIdAndUpdate(userId, { $push: { borrowedBooks: bookId } });
+
+        const populatedBorrow = await Borrow.findById(borrow._id)
+            .populate('userId', '_id name email')
+            .populate('bookId', '_id title');
+
+        const response = {
+            "userid": populatedBorrow.userId._id,
+            "user name": populatedBorrow.userId.name,
+            "email": populatedBorrow.userId.email,
+            "book id": populatedBorrow.bookId._id,
+            "book name": populatedBorrow.bookId.title,
+            "borrowed date": formatCustomDate(populatedBorrow.borrowDate),
+            "due date": formatCustomDate(populatedBorrow.dueDate)
+        };
+
         res.status(200).json({
             message: "Book borrowed successfully.",
-            borrow,
+            borrow: response,
         })
     } catch (error) {
         res.status(500).json({
@@ -48,20 +71,55 @@ export const borrowBook = async (req, res) => {
     }
 }
 
+export const getAllBorrows = async (req, res) => {
+    try {
+        const borrows = await Borrow.find()
+            .populate('userId', '_id name email')
+            .populate('bookId', '_id title');
+
+        const formattedBorrows = borrows.map(b => ({
+            "userid": b.userId._id,
+            "user name": b.userId.name,
+            "email": b.userId.email,
+            "book id": b.bookId._id,
+            "book name": b.bookId.title,
+            "borrowed date": formatCustomDate(b.borrowDate),
+            "due date": formatCustomDate(b.dueDate)
+        }));
+
+        res.status(200).json({
+            message: "All borrow records retrieved successfully.",
+            borrows: formattedBorrows,
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: "Internal Server Error",
+            error: error.message,
+        });
+    }
+};
+
 
 export const returnBook = async (req, res) => {
     try {
-        const { borrowId } = req.params;
+        const { bookId } = req.params;
+        const userId = req.user.id;
 
-        const borrow = await Borrow.findById(borrowId);
+        const borrow = await Borrow.findOne({ bookId, userId, returnDate: null });
 
-        if (!borrow || borrow.returnDate !== null) {
+        if (!borrow) {
             return res.status(404).json({
                 message: "Borrow record not found"
             })
         }
 
         borrow.returnDate = new Date();
+
+        if (borrow.returnDate > borrow.dueDate) {
+            const overdueDays = Math.ceil((borrow.returnDate - borrow.dueDate) / (1000 * 60 * 60 * 24));
+            borrow.fine = overdueDays * 10; // 10 units of fine per overdue day
+        }
+
         await borrow.save();
 
         const book = await Book.findById(borrow.bookId);
@@ -70,9 +128,25 @@ export const returnBook = async (req, res) => {
             await book.save();
         }
 
+        await User.findByIdAndUpdate(borrow.userId, { $pull: { borrowedBooks: borrow.bookId } });
+
+        const populatedBorrow = await Borrow.findById(borrow._id)
+            .populate('userId', '_id name email')
+            .populate('bookId', '_id title');
+
+        const response = {
+            "userid": populatedBorrow.userId._id,
+            "user name": populatedBorrow.userId.name,
+            "email": populatedBorrow.userId.email,
+            "book id": populatedBorrow.bookId._id,
+            "book name": populatedBorrow.bookId.title,
+            "borrowed date": formatCustomDate(populatedBorrow.borrowDate),
+            "due date": formatCustomDate(populatedBorrow.dueDate)
+        };
+
         res.status(200).json({
             message: "Book returned successfully.",
-            borrow
+            borrow: response
         })
     } catch (error) {
         res.status(500).json({

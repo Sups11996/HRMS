@@ -2,12 +2,12 @@ import mongoose, { mongo } from "mongoose";
 
 const BorrowSchema = new mongoose.Schema({
     userId: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: String,
         ref: 'User',
         required: true
     },
     bookId: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: String,
         ref: 'Book',
         required: true
     },
@@ -16,9 +16,17 @@ const BorrowSchema = new mongoose.Schema({
         default: Date.now,
         required: true
     },
+    dueDate: {
+        type: Date,
+        required: true
+    },
     returnDate: {
         type: Date,
         default: null
+    },
+    fine: {
+        type: Number,
+        default: 0
     }
 });
 

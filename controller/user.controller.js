@@ -60,7 +60,7 @@ export const createUser = async (req, res) => {
 export const getUserById = async (req, res) => {
     try {
         const id = req.params.id
-        const user = await User.findById(id).populate('borrowedBooks');
+        const user = await User.findById(id).populate('borrowedBooks', 'title _id');
 
         if (!user) {
             return res.status(404).json({
@@ -82,7 +82,7 @@ export const getUserById = async (req, res) => {
 // Get all users
 export const getAllUsers = async (req, res) => {
     try {
-        const users = await User.find().populate('borrowedBooks');
+        const users = await User.find().populate('borrowedBooks', 'title _id');
         res.status(201).json({
             message: 'All the users',
             users,
