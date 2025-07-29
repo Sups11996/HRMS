@@ -18,9 +18,21 @@ export const verifyToken = (req, res, next) => {
         req.user = decoded;
         next();
     } catch (error) {
-        res.status(500).json({
-            message: "Internal Server Error",
-            error: error.message,
-        });
+        // Handle JWT errors explicitly for better clarity
+        if (error.name === 'TokenExpiredError') {
+            return res.status(401).json({
+                message: 'Unauthorized: Token expired. Please login again.'
+            });
+        } else if (error.name === 'JsonWebTokenError') {
+            return res.status(401).json({
+                message: 'Unauthorized: Invalid token.'
+            });
+        } else {
+            // For unexpected errors, you can still return 500 or 401, but 500 is clearer
+            return res.status(500).json({
+                message: 'Internal Server Error',
+                error: error.message,
+            });
+        }
     }
 }

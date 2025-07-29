@@ -1,22 +1,15 @@
 import { User } from '../models/user.model.js'
 import bcrypt from 'bcrypt'
-import generateSixDigitId from '../utils/id.generator.js';
+import { generateId } from '../utils/id.generator.js';
+import {validate} from '../middleware/validate.middleware.js';
+import { createUserSchema, updateUserSchema } from '../validators/user.validator.js';
 
 // Create a new user
-export const createUser = async (req, res) => {
+export const createUser = [
+    validate(createUserSchema), 
+async (req, res) => {
     try {
         const { name, email, password, role } = req.body;
-
-        if (!name || !email || !password || !role) {
-            return res.status(400).json({
-                message: 'Please fill out all the required fields.'
-            })
-        }
-
-        if (!/^[A-Za-z ]+$/.test(name)) return res.status(400).json({ message: 'Name should contain only letters' });
-        if (!/^\S+@\S+\.\S+$/.test(email)) return res.status(400).json({ message: 'Invalid email format' });
-        if (password.length < 8) return res.status(400).json({ message: 'Password must be at least 8 characters' });
-
 
         // check for existing user
         const alreadyExists = await User.findOne({ email });
@@ -26,8 +19,8 @@ export const createUser = async (req, res) => {
             })
         }
 
-        const hashedPassword = bcrypt.hashSync(password, 10);
-        const userId = generateSixDigitId();
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const userId = await generateId();
 
         const newUser = new User({
             _id: userId,
@@ -54,7 +47,7 @@ export const createUser = async (req, res) => {
             error: error.message,
         });
     }
-}
+}];
 
 // Get user by id
 export const getUserById = async (req, res) => {
@@ -67,7 +60,7 @@ export const getUserById = async (req, res) => {
                 message: 'User not found'
             })
         };
-        res.status(201).json({
+        res.status(200).json({
             message: 'User fetched successfully',
             user,
         })
@@ -83,7 +76,7 @@ export const getUserById = async (req, res) => {
 export const getAllUsers = async (req, res) => {
     try {
         const users = await User.find().populate('borrowedBooks', 'title _id');
-        res.status(201).json({
+        res.status(200).json({
             message: 'All the users',
             users,
         })
@@ -95,33 +88,44 @@ export const getAllUsers = async (req, res) => {
     }
 }
 
-// update user
-export const updateUser = async (req, res) => {
-    try {
-        const updates = req.body;
-        const updatedUser = await User.findByIdAndUpdate(
-            req.params.id,
-            updates,
-            { new: true }
-        );
+export const updateUser = [
+    validate(updateUserSchema),
+    async (req, res) => {
+        try {
+            const updates = req.body;
 
-        if (!updateUser) {
-            return res.status(404).json({
-                message: 'User not found.'
-            })
+            // If password is being updated, hash it
+            if (updates.password) {
+                const salt = await bcrypt.genSalt(10);
+                updates.password = await bcrypt.hash(updates.password, salt);
+            }
+
+            const updatedUser = await User.findByIdAndUpdate(
+                req.params.id,
+                updates,
+                { new: true, runValidators: true }
+            );
+
+            if (!updatedUser) {
+                return res.status(404).json({ message: 'User not found.' });
+            }
+
+            const userObj = updatedUser.toObject();
+            delete userObj.password;
+
+            res.status(200).json({
+                message: 'User updated successfully.',
+                updatedUser: userObj
+            });
+        } catch (error) {
+            res.status(500).json({
+                message: "Internal Server Error",
+                error: error.message,
+            });
         }
-
-        res.status(201).json({
-            message: 'User updated successfully.',
-            updatedUser
-        });
-    } catch (error) {
-        res.status(500).json({
-            message: "Internal Server Error",
-            error: error.message,
-        });
     }
-}
+];
+
 
 // delete user
 export const deleteUser = async (req, res) => {

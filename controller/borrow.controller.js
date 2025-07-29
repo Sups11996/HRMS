@@ -2,74 +2,78 @@ import { formatCustomDate } from "../utils/date.formatter.js";
 import { Borrow } from "../models/borrow.model.js";
 import { Book } from "../models/book.model.js";
 import { User } from "../models/user.model.js";
+import { validate } from '../middlewares/validate.middleware.js';
+import { borrowSchema } from '../validators/borrow.validator.js';
 
-export const borrowBook = async (req, res) => {
-    try {
-        const { userId, bookId } = req.body;
+export const borrowBook = [
+    validate(borrowSchema),
+    async (req, res) => {
+        try {
+            const { userId, bookId } = req.body;
 
-        const activeBorrows = await Borrow.countDocuments({ userId, returnDate: null });
-        if (activeBorrows >= 3) {
-            return res.status(400).json({
-                message: "You have reached the maximum number of borrowed books (3)."
+            const activeBorrows = await Borrow.countDocuments({ userId, returnDate: null });
+            if (activeBorrows >= 3) {
+                return res.status(400).json({
+                    message: "You have reached the maximum number of borrowed books (3)."
+                });
+            }
+
+            const book = await Book.findById(bookId);
+            if (!book) {
+                return res.status(404).json({
+                    message: "Book not found."
+                })
+            }
+
+            if (book.available <= 0) {
+                return res.status(400).json({
+                    message: "Book is not available at the moment."
+                })
+            }
+
+            const borrowDate = new Date();
+            const dueDate = new Date(borrowDate);
+            dueDate.setDate(dueDate.getDate() + 7);
+
+            const borrow = new Borrow({
+                userId,
+                bookId,
+                borrowDate,
+                dueDate,
+                returnDate: null
+            })
+
+            await borrow.save();
+            book.available -= 1;
+            await book.save();
+
+            await User.findByIdAndUpdate(userId, { $push: { borrowedBooks: bookId } });
+
+            const populatedBorrow = await Borrow.findById(borrow._id)
+                .populate('userId', '_id name email')
+                .populate('bookId', '_id title');
+
+            const response = {
+                "userid": populatedBorrow.userId._id,
+                "user name": populatedBorrow.userId.name,
+                "email": populatedBorrow.userId.email,
+                "book id": populatedBorrow.bookId._id,
+                "book name": populatedBorrow.bookId.title,
+                "borrowed date": formatCustomDate(populatedBorrow.borrowDate),
+                "due date": formatCustomDate(populatedBorrow.dueDate)
+            };
+
+            res.status(200).json({
+                message: "Book borrowed successfully.",
+                borrow: response,
+            })
+        } catch (error) {
+            res.status(500).json({
+                message: "Internal Server Error",
+                error: error.message,
             });
         }
-
-        const book = await Book.findById(bookId);
-        if (!book) {
-            return res.status(404).json({
-                message: "Book not found."
-            })
-        }
-
-        if (book.available <= 0) {
-            return res.status(400).json({
-                message: "Book is not available at the moment."
-            })
-        }
-
-        const borrowDate = new Date();
-        const dueDate = new Date(borrowDate);
-        dueDate.setDate(dueDate.getDate() + 7);
-
-        const borrow = new Borrow({
-            userId,
-            bookId,
-            borrowDate,
-            dueDate,
-            returnDate: null
-        })
-
-        await borrow.save();
-        book.available -= 1;
-        await book.save();
-
-        await User.findByIdAndUpdate(userId, { $push: { borrowedBooks: bookId } });
-
-        const populatedBorrow = await Borrow.findById(borrow._id)
-            .populate('userId', '_id name email')
-            .populate('bookId', '_id title');
-
-        const response = {
-            "userid": populatedBorrow.userId._id,
-            "user name": populatedBorrow.userId.name,
-            "email": populatedBorrow.userId.email,
-            "book id": populatedBorrow.bookId._id,
-            "book name": populatedBorrow.bookId.title,
-            "borrowed date": formatCustomDate(populatedBorrow.borrowDate),
-            "due date": formatCustomDate(populatedBorrow.dueDate)
-        };
-
-        res.status(200).json({
-            message: "Book borrowed successfully.",
-            borrow: response,
-        })
-    } catch (error) {
-        res.status(500).json({
-            message: "Internal Server Error",
-            error: error.message,
-        });
-    }
-}
+    }]
 
 export const getAllBorrows = async (req, res) => {
     try {

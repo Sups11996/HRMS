@@ -6,18 +6,25 @@ const UserSchema = new mongoose.Schema({
         required: true
     },
     name: {
-        type: String
+        type: String,
+        required: true,
+        trim: true
     },
     email: {
         type: String,
-        unique: true
+        unique: true,
+        required: true,
+        trim: true
     },
     password: {
-        type: String
+        type: String,
+        required: true,
+        trim: true
     },
     role: {
         type: String,
-        enum: ['borrower', 'librarian']
+        enum: ['borrower', 'librarian'],
+        required: true
     },
     borrowedBooks: [{
         type: String,
