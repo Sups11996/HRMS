@@ -1,6 +1,6 @@
 import { Book } from "../models/book.model.js";
 import { generateId } from '../utils/id.generator.js';
-import { validate } from '../middlewares/validate.middleware.js';
+import { validate } from '../middleware/validate.middleware.js';
 import { createBookSchema, updateBookSchema } from '../validators/book.validator.js';
 
 // add a new book
@@ -50,6 +50,27 @@ export const getAllBooks = async (req, res) => {
             message: "All books fetched.",
             books,
         })
+    } catch (error) {
+        res.status(500).json({
+            message: "Internal Server Error",
+            error: error.message,
+        });
+    }
+}
+
+// get a book by id
+export const getBookById = async (req, res) => {
+    try {
+        const book = await Book.findById(req.params.id);
+        if (!book) {
+            return res.status(404).json({
+                message: 'Book not found.',
+            });
+        }
+        res.status(200).json({
+            message: 'Book fetched successfully.',
+            book,
+        });
     } catch (error) {
         res.status(500).json({
             message: "Internal Server Error",

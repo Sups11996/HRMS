@@ -18,7 +18,6 @@ export const verifyToken = (req, res, next) => {
         req.user = decoded;
         next();
     } catch (error) {
-        // Handle JWT errors explicitly for better clarity
         if (error.name === 'TokenExpiredError') {
             return res.status(401).json({
                 message: 'Unauthorized: Token expired. Please login again.'
@@ -35,4 +34,4 @@ export const verifyToken = (req, res, next) => {
             });
         }
     }
-}
+};

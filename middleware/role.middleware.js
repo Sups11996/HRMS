@@ -1,3 +1,4 @@
+// function to verify if the user is librarian
 export const verifyLibrarian = (req, res, next) => {
     if (!req.user) {
         return res.status(401).json({ message: 'Unauthorized: No user info found.' });
@@ -9,6 +10,7 @@ export const verifyLibrarian = (req, res, next) => {
     next();
 };
 
+// function to verify if the user is borrower
 export const verifyBorrower = (req, res, next) => {
     if (!req.user) {
         return res.status(401).json({ message: 'Unauthorized: No user info found.' });

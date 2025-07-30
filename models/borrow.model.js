@@ -1,8 +1,8 @@
-import mongoose, { mongo } from "mongoose";
+import mongoose from "mongoose";
 
 const BorrowSchema = new mongoose.Schema({
     userId: {
-        type: String,
+        type: String,   // Change from ObjectId to String
         ref: 'User',
         required: true
     },

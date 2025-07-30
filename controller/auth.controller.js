@@ -1,7 +1,7 @@
 import { User } from '../models/user.model.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { validate } from '../middlewares/validate.middleware.js';
+import { validate } from '../middleware/validate.middleware.js';
 import { loginSchema } from '../validators/auth.validator.js';
 
 export const loginUser = [
@@ -32,7 +32,7 @@ export const loginUser = [
             const token = jwt.sign(
                 { id: user._id, role: user.role },
                 process.env.JWT_SECRET,
-                { expiresIn: '30d' } 
+                { expiresIn: '30d' }
             );
 
 

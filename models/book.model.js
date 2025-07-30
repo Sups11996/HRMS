@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 const BookSchema = new mongoose.Schema({
     _id: {
-        type: String,
+        type: String,   // Change from ObjectId to String
         required: true
     },
     title: {

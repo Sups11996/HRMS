@@ -6,7 +6,7 @@ import BookRouter from './routes/book.route.js'
 import AuthRouter from './routes/auth.route.js'
 import BorrowRouter from './routes/borrow.route.js'
 
-const PORT = 8000
+const PORT = 8000;
 
 const app = express();
 app.use(express.json());
